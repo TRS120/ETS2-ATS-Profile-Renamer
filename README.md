@@ -4,7 +4,8 @@ A specialized web utility designed to help Euro Truck Simulator 2 and American T
 
 🔗 Live Demo
 
-https://github.com/TRS120/ETS2-ATS-Profile-Renamer
+https://github.com/TRS120/ETS2-ATS-Profile-Renamer/blob/main/Screenshot%202026-02-16%20202845.png
+
 
 🛠 How to Rename Your Profile
 
