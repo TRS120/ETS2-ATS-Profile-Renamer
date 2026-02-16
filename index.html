@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ETS2/ATS Live Sync Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        
+        :root { --accent: #38bdf8; --bg: #0b0f1a; --card: #161e2d; }
+        body { 
+            background-color: var(--bg); 
+            color: #e2e8f0; 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-image: radial-gradient(circle at 50% -20%, #1e293b 0%, #0b0f1a 100%);
+        }
+        .glass-card { 
+            background: rgba(22, 30, 45, 0.7); 
+            backdrop-filter: blur(12px); 
+            border: 1px solid rgba(255,255,255,0.08); 
+            border-radius: 16px; 
+        }
+        .input-box {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid #2d3748;
+            color: white;
+            transition: all 0.3s ease;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .input-box:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+        }
+        .unit-select {
+            background: #1e293b;
+            border-left: 1px solid #2d3748;
+            color: var(--accent);
+            font-weight: 800;
+            font-size: 0.75rem;
+            cursor: pointer;
+            outline: none;
+            padding: 0 10px;
+        }
+        .label-text {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .sync-icon {
+            color: var(--accent);
+            opacity: 0.5;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-12">
+
+    <header class="py-10 text-center">
+        <h1 class="text-3xl font-extrabold tracking-tight text-white mb-2">
+            <i class="fas fa-sync-alt mr-2 text-sky-400"></i>LIVE <span class="text-sky-400">SYNC</span> CONVERTER
+        </h1>
+        <p class="text-slate-400 text-sm">ETS2/ATS Weight & Text Conversion</p>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 grid gap-8">
+
+        <!-- Section 1: Weight & Float -->
+        <section class="glass-card p-8">
+            <div class="flex items-center gap-3 mb-8">
+                <i class="fas fa-balance-scale text-sky-400 text-xl"></i>
+                <h2 class="font-bold text-xl">Weight / Float Sync</h2>
+            </div>
+
+            <div class="grid md:grid-cols-[1fr_auto_1fr] items-center gap-6">
+                <!-- Weight Input -->
+                <div class="relative">
+                    <label class="label-text">Number / Weight</label>
+                    <div class="input-box flex overflow-hidden rounded-xl">
+                        <input type="number" id="floatInput" placeholder="0.0" class="bg-transparent w-full p-4 text-lg outline-none" oninput="syncFloatToHex()">
+                        <select id="unitSelector" class="unit-select" onchange="syncFloatToHex()">
+                            <option value="ton">TON</option>
+                            <option value="kg">KG</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="hidden md:block">
+                    <i class="fas fa-arrows-left-right sync-icon"></i>
+                </div>
+
+                <div class="relative">
+                    <label class="label-text">SII Hex (e.g. &43FA4000)</label>
+                    <input type="text" id="hexInput" placeholder="HEX CODE" class="input-box w-full p-4 rounded-xl text-lg uppercase outline-none" oninput="syncHexToFloat()">
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Text & String -->
+        <section class="glass-card p-8">
+            <div class="flex items-center gap-3 mb-8">
+                <i class="fas fa-font text-emerald-400 text-xl"></i>
+                <h2 class="font-bold text-xl">Text / String Sync</h2>
+            </div>
+
+            <div class="grid md:grid-cols-[1fr_auto_1fr] items-center gap-6">
+                <div>
+                    <label class="label-text">Plain Text</label>
+                    <textarea id="textInput" placeholder="Type text here..." class="input-box w-full p-4 rounded-xl h-32 text-sm outline-none" oninput="syncTextToHex()"></textarea>
+                </div>
+
+                <div class="hidden md:block">
+                    <i class="fas fa-arrows-left-right sync-icon"></i>
+                </div>
+
+                <div>
+                    <label class="label-text">Hex Representation</label>
+                    <textarea id="hexTextInput" placeholder="Hex string output..." class="input-box w-full p-4 rounded-xl h-32 text-sm uppercase outline-none" oninput="syncHexToText()"></textarea>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Logic: Float & Hex Sync
+        function floatToHex(f) {
+            const buf = new ArrayBuffer(4);
+            (new Float32Array(buf))[0] = f;
+            return Array.from(new Uint8Array(buf)).reverse()
+                .map(b => b.toString(16).padStart(2, '0').toUpperCase())
+                .join('');
+        }
+
+        function hexToFloat(h) {
+            h = h.replace(/[&]/g, '').trim();
+            if (h.length !== 8) return null;
+            try {
+                const bytes = new Uint8Array(h.match(/.{1,2}/g).map(b => parseInt(b, 16)).reverse());
+                return new Float32Array(bytes.buffer)[0];
+            } catch(e) { return null; }
+        }
+
+        function syncFloatToHex() {
+            const valInput = document.getElementById('floatInput').value;
+            const unit = document.getElementById('unitSelector').value;
+            const target = document.getElementById('hexInput');
+            
+            if (valInput === "") { target.value = ""; return; }
+            
+            let val = parseFloat(valInput);
+            const finalVal = unit === 'ton' ? val * 1000 : val;
+            target.value = '&' + floatToHex(finalVal);
+        }
+
+        function syncHexToFloat() {
+            const val = document.getElementById('hexInput').value.trim();
+            const unit = document.getElementById('unitSelector').value;
+            const target = document.getElementById('floatInput');
+            
+            if (val === "" || val === "&") {
+                target.value = "";
+                return;
+            }
+            
+            const result = hexToFloat(val);
+            if (result !== null && !isNaN(result)) {
+                const displayVal = unit === 'ton' ? result / 1000 : result;
+                target.value = parseFloat(displayVal.toFixed(5));
+            }
+        }
+
+        // Logic: Text & Hex Sync
+        function syncTextToHex() {
+            const txt = document.getElementById('textInput').value;
+            const target = document.getElementById('hexTextInput');
+            if (!txt) { target.value = ""; return; }
+            const hex = Array.from(new TextEncoder().encode(txt))
+                .map(b => b.toString(16).padStart(2, '0').toUpperCase())
+                .join('');
+            target.value = hex;
+        }
+
+        function syncHexToText() {
+            let val = document.getElementById('hexTextInput').value;
+            const target = document.getElementById('textInput');
+            
+            if (val.trim() === "") {
+                target.value = "";
+                return;
+            }
+
+            let hex = val.replace(/[^0-9A-Fa-f]/g, '');
+            if (hex.length < 2 || hex.length % 2 !== 0) return;
+            try {
+                const bytes = new Uint8Array(hex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+                target.value = new TextDecoder().decode(bytes);
+            } catch(e) {}
+        }
+    </script>
+</body>
+</html>
