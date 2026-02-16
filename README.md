@@ -5,6 +5,9 @@ A specialized web utility designed to help Euro Truck Simulator 2 and American T
 
 🛠 How to Rename Your Profile
 
+
+Use it Live: https://trs120.github.io/ETS2-ATS-Profile-Renamer/
+
 Convert: Enter your new desired name in the tool and click the Copy button to get the Hex string.
 
 Folder Rename: Navigate to Documents/Euro Truck Simulator 2/profiles and rename the target folder using the copied Hex string.
