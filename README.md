@@ -1,4 +1,4 @@
-ETS2/ATS Profile Renamer Tool 🚛
+ETS2/ATS Profile Renamer🚛
 
 A specialized web utility designed to help Euro Truck Simulator 2 and American Truck Simulator players rename their profiles correctly.
 
