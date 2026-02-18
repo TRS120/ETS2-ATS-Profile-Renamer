@@ -1,14 +1,14 @@
-ETS2/ATS Profile Renamer🚛
+ETS2/ATS LIVE SYNC CONVERTER🚛
 
 A web utility to help Euro Truck Simulator 2 and American Truck Simulator players rename profiles correctly.
 
-Use it Live: https://trs120.github.io/ETS2-ATS-Profile-Renamer/
+Use it Live: https://trs120.github.io/ETS2-Live-Sync-Converter/
 
 ![App Screenshot](https://github.com/TRS120/ETS2-ATS-Profile-Renamer/blob/d587032a97e6c4553b3acec0d842e8f76ecd7b18/Screenshot%202026-02-16%20215938.png?raw=true)
 
 🛠 How to Rename Profile
 
-Open: https://trs120.github.io/ETS2-ATS-Profile-Renamer/
+Open: https://trs120.github.io/ETS2-Live-Sync-Converter/
 
 Convert: Enter your new desired name in the tool and click the Copy button to get the Hex string.
 
